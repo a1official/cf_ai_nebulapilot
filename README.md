@@ -3,6 +3,7 @@
 **Nebula Pilot** is an AI execution copilot built on Cloudflare for the internship AI app assignment.
 
 It combines:
+
 - chat-based user input
 - Workers AI (Llama 3.3)
 - durable memory/state
@@ -13,6 +14,7 @@ It combines:
 ## Assignment Fit
 
 This project satisfies the required components:
+
 - `LLM`: Workers AI (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`)
 - `Workflow / coordination`: Cloudflare Workflows + Agents tools
 - `User input`: Chat UI (React + Cloudflare Agents)
@@ -44,6 +46,7 @@ This project satisfies the required components:
 ## Context Management Strategy
 
 Nebula Pilot is designed to avoid context-window bloat:
+
 - Large tool outputs are stored in durable state, not repeatedly replayed.
 - Each model turn includes a compact state snapshot (profile, plan status, usage, recent progress/events).
 - Message history is pruned before model calls.
@@ -140,6 +143,7 @@ npm run deploy
 ## Integration Webhooks (Optional)
 
 The following env vars can enable direct external sync:
+
 - `CALENDAR_SYNC_WEBHOOK`
 - `WORK_ITEM_SYNC_WEBHOOK`
 - `EMAIL_DIGEST_WEBHOOK`
