@@ -1,0 +1,53 @@
+{
+  "name": "cf_ai_goal_coach",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered goal coach built with Cloudflare Agents, Workers AI, Durable Objects, and Workflows",
+  "keywords": [
+    "agents",
+    "ai",
+    "cloudflare"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "start": "vite dev",
+    "deploy": "vite build && wrangler deploy",
+    "types": "wrangler types env.d.ts --include-runtime false",
+    "format": "oxfmt --write .",
+    "lint": "oxlint src/",
+    "check": "oxfmt --check . && oxlint src/ && tsc"
+  },
+  "dependencies": {
+    "@cloudflare/ai-chat": "^0.3.2",
+    "@cloudflare/kumo": "^1.16.0",
+    "@cloudflare/playwright": "^1.2.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@streamdown/code": "^1.1.1",
+    "agents": "^0.9.0",
+    "ai": "^6.0.142",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "streamdown": "^2.5.0",
+    "workers-ai-provider": "^3.1.8",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.29.0",
+    "@cloudflare/vite-plugin": "1.30.3",
+    "@cloudflare/workers-types": "^4.20260401.1",
+    "@rolldown/plugin-babel": "^0.2.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "wrangler": "4.79.0"
+  }
+}

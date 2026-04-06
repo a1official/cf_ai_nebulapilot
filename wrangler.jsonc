@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cf-ai-goal-coach",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-03-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "ai": { "binding": "AI", "remote": true },
+  "browser": { "binding": "BROWSER" },
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/agents/*", "/oauth/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "ChatAgent",
+        "name": "ChatAgent"
+      }
+    ]
+  },
+  "workflows": [
+    {
+      "name": "goal-planning-workflow",
+      "binding": "GOAL_PLANNING_WORKFLOW",
+      "class_name": "GoalPlanningWorkflow"
+    }
+  ],
+  "migrations": [
+    {
+      "new_sqlite_classes": ["ChatAgent"],
+      "tag": "v1"
+    }
+  ]
+}
