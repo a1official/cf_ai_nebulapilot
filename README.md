@@ -1,6 +1,6 @@
 # cf_ai_goal_coach
 
-`cf_ai_goal_coach` now runs as **NebulaPilot**, an AI-powered execution copilot built for the Cloudflare internship assignment. It gives users a chat interface, remembers durable profile details, and can start a background workflow that generates a practical seven-day action plan for a goal.
+`cf_ai_goal_coach` now runs as **Nebula Pilot**, an AI-powered execution copilot built for the Cloudflare internship assignment. It gives users a chat interface, remembers durable profile details, and can start a background workflow that generates a practical seven-day action plan for a goal.
 
 ## Assignment checklist
 
@@ -11,7 +11,7 @@
 
 ## What the app does
 
-Users can chat with NebulaPilot, save stable context like their name, goal, study cadence, and constraints, then ask the app to create a seven-day plan. The plan is generated in a background workflow and stored back into durable state so the UI can show workflow progress and the final result.
+Users can chat with Nebula Pilot, save stable context like their name, goal, study cadence, and constraints, then ask the app to create a seven-day plan. The plan is generated in a background workflow and stored back into durable state so the UI can show workflow progress and the final result.
 
 The bot also has web browsing capability using Cloudflare Browser Rendering + Playwright through a `browseAndSummarize` tool, so it can fetch up-to-date public page content when users ask for current information.
 It also supports `browseWithScreenshot` to capture a visual snapshot of a page alongside extracted text.
