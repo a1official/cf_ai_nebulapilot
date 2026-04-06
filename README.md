@@ -1,6 +1,6 @@
 # cf_ai_goal_coach
 
-**Nebula Pilot** is an AI execution copilot built on Cloudflare for the internship AI app assignment.
+**Nebula Pilot** is an AI execution copilot built on Cloudflare for an AI application project.
 
 It combines:
 
