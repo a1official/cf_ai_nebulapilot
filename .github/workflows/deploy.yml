@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          if ! npx wrangler deploy 2>&1 | tee wrangler-deploy.log; then
+          if ! npm run deploy 2>&1 | tee wrangler-deploy.log; then
             summary="$(tail -n 40 wrangler-deploy.log | tr '\n' ' ' | sed 's/"/'\''/g')"
             echo "::error title=Wrangler deploy failed::$summary"
             exit 1
