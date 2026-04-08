@@ -235,6 +235,46 @@ function estimateLastUserChars(messages: ModelMessage[]) {
   return 0;
 }
 
+function getLastUserText(messages: ModelMessage[]) {
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    const message = messages[i];
+    if (message.role !== "user") continue;
+    if (typeof message.content === "string") return message.content.trim();
+    return message.content
+      .filter((part) => part.type === "text")
+      .map((part) => part.text)
+      .join(" ")
+      .trim();
+  }
+  return "";
+}
+
+function shouldEnableToolCalls(lastUserText: string) {
+  const text = lastUserText.toLowerCase();
+  if (!text) return false;
+
+  const toolIntentPatterns = [
+    /\b(save|remember).*\b(name|goal|cadence|constraint|memory)\b/,
+    /\b(create|make|build|start).*\b(plan|roadmap|7[- ]?day)\b/,
+    /\b(view|show|read).*\bmemory\b/,
+    /\bbrowse\b/,
+    /\bscreenshot\b/,
+    /\bextract\b.*\b(schema|structured)\b/,
+    /\bfact[- ]?check\b/,
+    /\brss\b/,
+    /\bpdf\b/,
+    /\bcalendar\b/,
+    /\bnotion\b|\bjira\b|\bwork item\b/,
+    /\bvoice mode\b|\btts\b/,
+    /\bprogress\b|\bstreak\b/,
+    /\bdigest\b/,
+    /\bcost guard\b|\blimits?\b/,
+    /\bschedule\b|\bremind me\b/
+  ];
+
+  return toolIntentPatterns.some((pattern) => pattern.test(text));
+}
+
 function shouldBlockExpensiveTools(state: CoachState) {
   const usage = getToolkit(state).usage;
   return (
@@ -474,6 +514,8 @@ export class ChatAgent extends AIChatAgent<Env, CoachState> {
     };
     this.setState(nextState);
     const compactState = compactStateForPrompt(nextState);
+    const lastUserText = getLastUserText(modelMessages);
+    const allowToolCalls = shouldEnableToolCalls(lastUserText);
 
     const result = streamText({
       model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
@@ -511,6 +553,8 @@ Behavior rules:
 - Keep replies warm, concise, and practical.
 - Never output raw tool/function schemas, JSON argument templates, or internal function names unless the user explicitly asks for technical schema output.
 - When users ask what you can do, answer in natural language with a short, practical capability list and 3-5 example prompts.
+- Do not say the user's input is insufficient for broad questions like "what can you do"; answer directly with helpful examples.
+- By default, answer in normal chat mode. Only call tools when the user explicitly asks for an action that requires one.
 
 ${getSchedulePrompt({ date: new Date() })}
 
@@ -519,6 +563,7 @@ If the user asks to schedule a reminder or check-in, use the schedule tool.`,
         messages: modelMessages,
         toolCalls: "before-last-2-messages"
       }),
+      toolChoice: allowToolCalls ? "auto" : "none",
       tools: {
         ...mcpTools,
 
