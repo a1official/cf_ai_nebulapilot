@@ -45,7 +45,14 @@ jobs:
         run: npm run check
 
       - name: Deploy with Wrangler
-        run: npx wrangler deploy
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! npx wrangler deploy 2>&1 | tee wrangler-deploy.log; then
+            summary="$(tail -n 40 wrangler-deploy.log | tr '\n' ' ' | sed 's/"/'\''/g')"
+            echo "::error title=Wrangler deploy failed::$summary"
+            exit 1
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 4cbd057d5427e76a2d00461355119746
