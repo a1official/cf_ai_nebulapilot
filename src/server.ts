@@ -277,6 +277,25 @@ function shouldEnableToolCalls(lastUserText: string) {
   return toolIntentPatterns.some((pattern) => pattern.test(text));
 }
 
+function isWebSearchRequest(text: string) {
+  return /\b(web|internet)\s+search\b|\bsearch for\b|\bsearch about\b|\blook up\b|\btell me about\b/i.test(
+    text
+  );
+}
+
+function extractSearchQuery(text: string) {
+  const cleaned = text
+    .replace(/^(hi|hello|hey)\b[:,!\s]*/i, "")
+    .trim();
+  const match = cleaned.match(
+    /(?:web|internet)?\s*search(?:\s+(?:for|about))?\s+(.+)$|look up\s+(.+)$|tell me about\s+(.+)$/i
+  );
+  const query = (match?.[1] || match?.[2] || match?.[3] || cleaned)
+    .replace(/[?.!,]+$/g, "")
+    .trim();
+  return query || cleaned;
+}
+
 function shouldBlockExpensiveTools(state: CoachState) {
   const usage = getToolkit(state).usage;
   return (
@@ -518,6 +537,83 @@ export class ChatAgent extends AIChatAgent<Env, CoachState> {
     const compactState = compactStateForPrompt(nextState);
     const lastUserText = getLastUserText(modelMessages);
     const allowToolCalls = shouldEnableToolCalls(lastUserText);
+
+    if (isWebSearchRequest(lastUserText)) {
+      const before = getStateSnapshot(this.state);
+      const beforeToolkit = getToolkit(before);
+      if (shouldBlockExpensiveTools(before)) {
+        return streamText({
+          model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+            sessionAffinity: this.sessionAffinity
+          }),
+          prompt:
+            "Reply in one short paragraph that web browsing is temporarily blocked because cost guard limits were reached, and suggest trying again later or adjusting cost guard settings."
+        }).toUIMessageStreamResponse();
+      }
+
+      this.setState({
+        ...before,
+        toolkit: {
+          ...beforeToolkit,
+          usage: {
+            ...beforeToolkit.usage,
+            toolCalls: beforeToolkit.usage.toolCalls + 1,
+            browserRuns: beforeToolkit.usage.browserRuns + 1
+          }
+        }
+      });
+
+      const query = extractSearchQuery(lastUserText);
+      const searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+      const browser = await launch(this.env.BROWSER);
+      try {
+        const page = await browser.newPage();
+        await page.goto(searchUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: 45_000
+        });
+        const title = await page.title();
+        const bodyText = await page
+          .locator("body")
+          .innerText()
+          .catch(() => "");
+        const excerpt = bodyText.replace(/\s+/g, " ").trim().slice(0, 7000);
+        const links = await page.locator("a").evaluateAll((anchors) =>
+          anchors
+            .map((anchor) => {
+              const href = anchor.getAttribute("href");
+              const text = anchor.textContent?.trim();
+              return href && text ? { href, text } : null;
+            })
+            .filter((value): value is { href: string; text: string } =>
+              Boolean(value)
+            )
+            .filter((item) => /^https?:\/\//i.test(item.href))
+            .slice(0, 10)
+        );
+
+        return streamText({
+          model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+            sessionAffinity: this.sessionAffinity
+          }),
+          prompt: `The user asked: "${lastUserText}".
+
+You already performed a web search.
+Search query: ${query}
+Search URL: ${searchUrl}
+Page title: ${title}
+Search excerpt: ${excerpt}
+Top links: ${JSON.stringify(links)}
+
+Respond as NebulaPilot in natural language:
+- Provide a concise summary of what Codex is.
+- Include 3 useful links from Top links if available.
+- Do not output JSON, tool schemas, or function call formats.`
+        }).toUIMessageStreamResponse();
+      } finally {
+        await browser.close();
+      }
+    }
 
     const result = streamText({
       model: workersai("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
