@@ -46,6 +46,9 @@ jobs:
       - name: Generate types
         run: npm run types
 
+      - name: Run checks
+        run: npm run check
+
       - name: Verify Cloudflare auth
         run: npx wrangler whoami
         env:

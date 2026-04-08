@@ -129,6 +129,23 @@ Open `http://localhost:5173`.
 npm run deploy
 ```
 
+## GitHub Actions CD
+
+The repository includes:
+
+- `.github/workflows/sanity-check.yml` to run formatting, linting, and TypeScript checks
+- `.github/workflows/deploy.yml` to deploy to Cloudflare on pushes to `main`
+
+Required GitHub repository secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+Important first-time Cloudflare setup:
+
+- Open the Workers & Pages dashboard for the target account at least once so Cloudflare provisions a `workers.dev` subdomain for the account.
+- Until that one-time setup is completed, Workers API calls that expect a `workers.dev` subdomain can fail even if the project itself is deployable.
+
 ## Example Prompts
 
 - `Create a seven-day action plan for interview prep.`
