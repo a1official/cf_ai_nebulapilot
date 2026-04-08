@@ -1501,9 +1501,16 @@ Recent progress: ${JSON.stringify(toolkit.progressLog.slice(0, 10))}
 
 export default {
   async fetch(request: Request, env: Env) {
-    return (
-      (await routeAgentRequest(request, env)) ||
-      new Response("Not found", { status: 404 })
-    );
+    const agentResponse = await routeAgentRequest(request, env);
+    if (agentResponse) {
+      return agentResponse;
+    }
+
+    const assets = (env as Env & { ASSETS?: Fetcher }).ASSETS;
+    if (assets) {
+      return assets.fetch(request);
+    }
+
+    return new Response("Not found", { status: 404 });
   }
 } satisfies ExportedHandler<Env>;
