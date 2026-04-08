@@ -35,13 +35,8 @@ jobs:
             echo "::error::Missing CLOUDFLARE_API_TOKEN secret"
             exit 1
           fi
-          if [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
-            echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"
-            exit 1
-          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Generate types
         run: npm run types
@@ -53,4 +48,4 @@ jobs:
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: 4cbd057d5427e76a2d00461355119746
