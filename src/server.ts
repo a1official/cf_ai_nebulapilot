@@ -258,6 +258,8 @@ function shouldEnableToolCalls(lastUserText: string) {
     /\b(create|make|build|start).*\b(plan|roadmap|7[- ]?day)\b/,
     /\b(view|show|read).*\bmemory\b/,
     /\bbrowse\b/,
+    /\bweb search\b|\binternet search\b/,
+    /\bsearch for\b|\bsearch about\b|\blook up\b/,
     /\bscreenshot\b/,
     /\bextract\b.*\b(schema|structured)\b/,
     /\bfact[- ]?check\b/,
@@ -555,6 +557,7 @@ Behavior rules:
 - When users ask what you can do, answer in natural language with a short, practical capability list and 3-5 example prompts.
 - Do not say the user's input is insufficient for broad questions like "what can you do"; answer directly with helpful examples.
 - By default, answer in normal chat mode. Only call tools when the user explicitly asks for an action that requires one.
+- If a user asks to search the web without giving a URL, use browseAndSummarize with a search URL and summarize the query results in plain language.
 
 ${getSchedulePrompt({ date: new Date() })}
 
