@@ -509,6 +509,8 @@ Behavior rules:
 - Use emailDigest for digest setup and send-now.
 - Use costGuard to inspect limits and block expensive calls if needed.
 - Keep replies warm, concise, and practical.
+- Never output raw tool/function schemas, JSON argument templates, or internal function names unless the user explicitly asks for technical schema output.
+- When users ask what you can do, answer in natural language with a short, practical capability list and 3-5 example prompts.
 
 ${getSchedulePrompt({ date: new Date() })}
 
