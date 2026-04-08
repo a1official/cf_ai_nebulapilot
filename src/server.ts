@@ -284,9 +284,7 @@ function isWebSearchRequest(text: string) {
 }
 
 function extractSearchQuery(text: string) {
-  const cleaned = text
-    .replace(/^(hi|hello|hey)\b[:,!\s]*/i, "")
-    .trim();
+  const cleaned = text.replace(/^(hi|hello|hey)\b[:,!\s]*/i, "").trim();
   const match = cleaned.match(
     /(?:web|internet)?\s*search(?:\s+(?:for|about))?\s+(.+)$|look up\s+(.+)$|tell me about\s+(.+)$/i
   );
